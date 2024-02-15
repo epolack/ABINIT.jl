@@ -1,12 +1,4 @@
-# Adapted from the Yggdrasil build script
-# Note that this script can accept some limited command-line arguments, run
-# `julia build_tarballs.jl --help` to see a usage message.
-using BinaryBuilder, Pkg, TOML
-
-# See https://github.com/JuliaLang/Pkg.jl/issues/2942
-# Once this Pkg issue is resolved, this must be removed
-uuid = Base.UUID("a83860b7-747b-57cf-bf1f-3e79990d037f")
-delete!(Pkg.Types.get_last_stdlibs(v"1.6.3"), uuid)
+using BinaryBuilder, Pkg
 
 GITHUB_REF_NAME = haskey(ENV, "GITHUB_REF_NAME") ? ENV["GITHUB_REF_NAME"] : ""
 
@@ -51,49 +43,3 @@ push!(deployingargs, "--deploy=local")
 
 build_tarballs(deployingargs, name, version, sources, script, platforms, products,
                dependencies; preferred_gcc_version=v"5", julia_compat="1.6")
-
-# if GITHUB_REF_NAME == "main"
-#     const testreg = "https://github.com/barche/CxxWrapTestRegistry.git"
-# 
-#     const repo = "barche/libcxxwrap_julia_jll.jl"
-# 
-#     Pkg.Registry.add(RegistrySpec(url = testreg))
-#     Pkg.develop(PackageSpec(url = "https://github.com/$(repo).git"))
-# 
-#     libcxxwrap_jll_project_toml = TOML.parsefile(joinpath(Pkg.devdir(), "libcxxwrap_julia_jll", "Project.toml"))
-#     build_version = parse(VersionNumber, libcxxwrap_jll_project_toml["version"])
-#     if version == VersionNumber(build_version.major, build_version.minor, build_version.patch)
-#         build_version = VersionNumber(build_version.major, build_version.minor, build_version.patch, (), build_version.build .+ 1)
-#     else
-#         build_version = version
-#     end
-# 
-#     mktemp() do jsonfile, _
-#         push!(deployingargs, "--meta-json=$jsonfile")
-#         build_tarballs(deployingargs, name, version, sources, script, platforms, products, dependencies;
-#             preferred_gcc_version = v"9", julia_compat = "1.6")
-# 
-#         json = String(read(jsonfile))
-#         buff = IOBuffer(strip(json))
-#         objs = []
-#         while !eof(buff)
-#             push!(objs, BinaryBuilder.JSON.parse(buff))
-#         end
-#         json_obj = objs[1]
-# 
-#         BinaryBuilder.cleanup_merged_object!(json_obj)
-#         json_obj["dependencies"] = Dependency[dep for dep in json_obj["dependencies"] if !isa(dep, BuildDependency)]
-# 
-#         tag = "$(name)-v$(build_version)"
-#         upload_prefix = "https://github.com/$(repo)/releases/download/$(tag)"
-# 
-#         download_dir = "products"
-#         BinaryBuilder.rebuild_jll_package(json_obj; download_dir, upload_prefix, build_version)
-#         BinaryBuilder.push_jll_package(name, build_version; deploy_repo = repo)
-#         BinaryBuilder.upload_to_github_releases(repo, tag, download_dir; verbose = true)
-#     end
-# 
-#     import libcxxwrap_julia_jll
-#     using LocalRegistry
-#     register(libcxxwrap_julia_jll, registry = testreg)
-# end
