@@ -1,3 +1,4 @@
 [deps]
 BinaryBuilder = "12aac903-9f7c-5d81-afc2-d9565ea332ae"
+GitHub = "bc5e4493-9b4d-5f90-b8aa-2b2bcaad7a26"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
