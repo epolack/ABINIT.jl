@@ -1,0 +1,155 @@
+diff --git a/config/m4/auto-optim.m4 b/config/m4/auto-optim.m4
+index 3ac81eb..21a3be2 100644
+--- a/config/m4/auto-optim.m4
++++ b/config/m4/auto-optim.m4
+@@ -41,11 +41,11 @@ AC_DEFUN([ABI_CC_OPTFLAGS],[
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          CFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          CFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          CFLAGS_OPTIM="-O3 -mtune=native -march=native"
++          CFLAGS_OPTIM="-O3"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+@@ -193,11 +193,11 @@ AC_DEFUN([ABI_CXX_OPTFLAGS],[
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          CXXFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          CXXFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          CXXFLAGS_OPTIM="-O3 -mtune=native -march=native"
++          CXXFLAGS_OPTIM="-O3"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+@@ -345,11 +345,11 @@ AC_DEFUN([ABI_FC_OPTFLAGS],[
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          FCFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          FCFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          FCFLAGS_OPTIM="-O3 -mtune=native -march=native -funroll-loops -faggressive-function-elimination"
++          FCFLAGS_OPTIM="-O3 -funroll-loops -faggressive-function-elimination"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+diff --git a/config/optim/cc_gnu_default-optim.conf b/config/optim/cc_gnu_default-optim.conf
+index eaa438a..7355477 100644
+--- a/config/optim/cc_gnu_default-optim.conf
++++ b/config/optim/cc_gnu_default-optim.conf
+@@ -17,6 +17,6 @@
+ 
+ [DEFAULT]
+ safe_comp = -O2
+-standard_comp = -O2 -mtune=native -march=native 
+-aggressive_comp = -O3 -mtune=native -march=native
++standard_comp = -O2 
++aggressive_comp = -O3
+ 
+diff --git a/config/optim/cxx_gnu_default-optim.conf b/config/optim/cxx_gnu_default-optim.conf
+index 3ddaef0..a752c12 100644
+--- a/config/optim/cxx_gnu_default-optim.conf
++++ b/config/optim/cxx_gnu_default-optim.conf
+@@ -17,5 +17,5 @@
+ 
+ [DEFAULT]
+ safe_comp = -O2
+-standard_comp = -O2 -mtune=native -march=native 
+-aggressive_comp = -O3 -mtune=native -march=native
++standard_comp = -O2 
++aggressive_comp = -O3
+diff --git a/config/optim/fc_gnu_default-optim.conf b/config/optim/fc_gnu_default-optim.conf
+index 31dd76e..3c5f355 100644
+--- a/config/optim/fc_gnu_default-optim.conf
++++ b/config/optim/fc_gnu_default-optim.conf
+@@ -17,5 +17,5 @@
+ 
+ [DEFAULT]
+ safe_comp = -O2
+-standard_comp = -O2 -mtune=native -march=native 
+-aggressive_comp = -O3 -mtune=native -march=native -funroll-loops -faggressive-function-elimination
++standard_comp = -O2 
++aggressive_comp = -O3 -funroll-loops -faggressive-function-elimination
+diff --git a/configure b/configure
+index 96ece5d..c76ec14 100755
+--- a/configure
++++ b/configure
+@@ -17435,11 +17435,11 @@ $as_echo_n "checking which cc optimizations to apply... " >&6; }
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          CFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          CFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          CFLAGS_OPTIM="-O3 -mtune=native -march=native"
++          CFLAGS_OPTIM="-O3"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+@@ -17588,11 +17588,11 @@ $as_echo_n "checking which cxx optimizations to apply... " >&6; }
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          CXXFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          CXXFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          CXXFLAGS_OPTIM="-O3 -mtune=native -march=native"
++          CXXFLAGS_OPTIM="-O3"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+@@ -17741,11 +17741,11 @@ $as_echo_n "checking which fc optimizations to apply... " >&6; }
+           ;;
+         standard)
+           abi_optim_flavor_opt="standard"
+-          FCFLAGS_OPTIM="-O2 -mtune=native -march=native"
++          FCFLAGS_OPTIM="-O2"
+           ;;
+         aggressive)
+           abi_optim_flavor_opt="aggressive"
+-          FCFLAGS_OPTIM="-O3 -mtune=native -march=native -funroll-loops -faggressive-function-elimination"
++          FCFLAGS_OPTIM="-O3 -funroll-loops -faggressive-function-elimination"
+           ;;
+       esac   # [case: abi_optim_flavor, indent: 2, item: True]
+       ;;
+diff --git a/doc/tests/tutoplugs/Refs/tz2_2_MPI10.abo b/doc/tests/tutoplugs/Refs/tz2_2_MPI10.abo
+index b45fd51..b11b7ac 100644
+--- a/doc/tests/tutoplugs/Refs/tz2_2_MPI10.abo
++++ b/doc/tests/tutoplugs/Refs/tz2_2_MPI10.abo
+@@ -68,7 +68,7 @@ ABI_PSPDIR  found in environment, with value /mnt/home/ogingras/Work/Gitlab/abin
+ 
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Default optimizations:
+-   -O2 -mtune=native -march=native
++   -O2
+ 
+ 
+  Optimizations for 43_ptgroups:
+diff --git a/tests/tutoplugs/Refs/tz2_2_MPI10.abo b/tests/tutoplugs/Refs/tz2_2_MPI10.abo
+index b45fd51..b11b7ac 100644
+--- a/tests/tutoplugs/Refs/tz2_2_MPI10.abo
++++ b/tests/tutoplugs/Refs/tz2_2_MPI10.abo
+@@ -68,7 +68,7 @@ ABI_PSPDIR  found in environment, with value /mnt/home/ogingras/Work/Gitlab/abin
+ 
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Default optimizations:
+-   -O2 -mtune=native -march=native
++   -O2
+ 
+ 
+  Optimizations for 43_ptgroups:

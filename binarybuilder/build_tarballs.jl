@@ -1,45 +1,83 @@
 using BinaryBuilder, Pkg
 
-GITHUB_REF_NAME = haskey(ENV, "GITHUB_REF_NAME") ? ENV["GITHUB_REF_NAME"] : ""
-
 name = "ABINIT"
-version = v"6.1.0"
+version = v"9.10.3"
 
-# Sources required for all builds
 sources = [
-    ArchiveSource("https://gitlab.com/libxc/libxc/-/archive/$(version)/libxc-$(version).tar.gz",
-                  "f593745fa47ebfb9ddc467aaafdc2fa1275f0d7250c692ce9761389a90dd8eaf"),
+    ArchiveSource("https://www.abinit.org/sites/default/files/packages/abinit-$(version).tar.gz",
+                  "3f2a9aebbf1fee9855a09dd687f88d2317b8b8e04f97b2628ab96fb898dce49b"),
+    DirectorySource(joinpath(@__DIR__, "patches")),
 ]
 
 script = raw"""
-cd $WORKSPACE/srcdir/libxc-*/
+cd abinit-*
+# Disable Kxc check because of cross-compilation. Libxc_jll does not support it anyway.
+atomic_patch -p1 ../disable_kxc_check.patch
+autoreconf -i
+mkdir ${prefix}/share/licenses/ABINIT
+cp ./doc/COPYING ${prefix}/share/licenses/ABINIT/COPYING
+export PYTHONPATH="/usr/lib/python3.9"
+atomic_patch -p1 ../remove_native.patch
 
-mkdir libxc_build
-cd libxc_build
-cmake -DCMAKE_INSTALL_PREFIX=$prefix -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TARGET_TOOLCHAIN} \
-    -DCMAKE_BUILD_TYPE=Release -DENABLE_XHOST=OFF -DBUILD_SHARED_LIBS=ON \
-    -DENABLE_FORTRAN=OFF -DDISABLE_KXC=ON ..
+export BLAS_LIBS="-L${libdir} -lopenblas"
+export LAPACK_LIBS="-L${libdir} -lopenblas"
+export FFTW3_LIBS="-L${libdir} -lfftw3 -lfftw3f"
 
-make -j${nproc}
+flags=(--with-mpi=no)
+flags+=(--with-libxc)
+flags+=(--with-fftw3)
+flags+=(--with-netcdf)
+flags+=(--with-netcdf-fortran="/workspace/destdir/")
+
+./configure --prefix=${prefix} --build=${MACHTYPE} --host=${target} ${flags[@]}
+make -j $nproc
 make install
 """
 
-platforms = [Platform("x86_64", "linux"; libc="glibc")]
+platforms = [
+             Platform("x86_64", "linux"; libgfortran_version=v"4.0.0"),
+             Platform("x86_64", "linux"; gflibgfortran_version=v"5.0.0"),
+            ]
 
 products = [
-    LibraryProduct("libxc", :libxc)
+    ExecutableProduct("abinit", :abinit),
+    ExecutableProduct("abitk", :abitk),
+    ExecutableProduct("aim", :aim),
+    ExecutableProduct("anaddb", :anaddb),
+    ExecutableProduct("atdep", :atdep),
+    ExecutableProduct("band2eps", :band2eps),
+    ExecutableProduct("conducti", :conducti),
+    ExecutableProduct("cut3d", :cut3d),
+    ExecutableProduct("dummy_tests", :dummy_tests),
+    ExecutableProduct("fftprof", :fftprof),
+    ExecutableProduct("fold2Bloch", :fold2Bloch),
+    ExecutableProduct("ioprof", :ioprof),
+    ExecutableProduct("lapackprof", :lapackprof),
+    ExecutableProduct("macroave", :macroave),
+    ExecutableProduct("mrgddb", :mrgddb),
+    ExecutableProduct("mrgdv", :mrgdv),
+    ExecutableProduct("mrggkk", :mrggkk),
+    ExecutableProduct("mrgscr", :mrgscr),
+    ExecutableProduct("multibinit", :multibinit),
+    ExecutableProduct("optic", :optic),
+    ExecutableProduct("testtransposer", :testtransposer),
+    ExecutableProduct("vdw_kernelgen", :vdw_kernelgen),
 ]
 
 dependencies = [
-    Dependency(PackageSpec(name="CompilerSupportLibraries_jll", uuid="e66e0078-7015-5450-92f7-15fbd957f2ae")),
+    Dependency("FFTW_jll"),
+    Dependency("HDF5_jll"),
+    Dependency("LAPACK_jll"),
+    Dependency("Libxc_jll"),
+    Dependency("NetCDFF_jll"),
+    Dependency(PackageSpec(; name="CompilerSupportLibraries_jll",
+                           uuid="e66e0078-7015-5450-92f7-15fbd957f2ae")),
+    Dependency(PackageSpec(; name="OpenBLAS32_jll",
+                           uuid="656ef2d0-ae68-5445-9ca0-591084a874a2")),
 ]
 
-GITHUB_REF_NAME = haskey(ENV, "GITHUB_REF_NAME") ? ENV["GITHUB_REF_NAME"] : ""
 deployingargs = deepcopy(ARGS)
-#if !isempty(GITHUB_REF_NAME) && GITHUB_REF_NAME != "main"
-#    push!(deployingargs, "--deploy=local")
-#end
 push!(deployingargs, "--deploy=local")
 
 build_tarballs(deployingargs, name, version, sources, script, platforms, products,
-               dependencies; preferred_gcc_version=v"5", julia_compat="1.6")
+               dependencies; preferred_gcc_version=v"12")

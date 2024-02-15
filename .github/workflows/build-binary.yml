@@ -1,11 +1,11 @@
 name: testjll
 on:
   - push
-    
+
 defaults:
   run:
     shell: bash
-    
+
 jobs:
   buildjll:
     name: Build JLL
@@ -46,8 +46,10 @@ jobs:
         with:
           name: ABINIT-binaries
           path: ./products
+          retention-days: 1
       - name: Upload JLL artifact
         uses: actions/upload-artifact@v3
         with:
           name: ABINIT_jll
           path: ~/.julia/dev/ABINIT_jll
+          retention-days: 1
