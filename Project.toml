@@ -1,0 +1,13 @@
+name = "ABINIT"
+uuid = "d8161b94-cc0e-11ee-1376-d73963e7741f"
+authors = ["Étienne Polack"]
+version = "9.10.3"
+
+[deps]
+ABINIT_jll = "498d8bb8-48f6-584d-8f05-fccc9a211def"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

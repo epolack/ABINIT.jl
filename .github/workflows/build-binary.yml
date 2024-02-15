@@ -1,4 +1,4 @@
-name: testjll
+name: Test JLL
 on:
   - push
 
@@ -7,17 +7,32 @@ defaults:
     shell: bash
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      binarybuilder: ${{ steps.changes.outputs.binarybuilder }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            binarybuilder:
+              - 'binarybuilder/**'
+
   buildjll:
     name: Build JLL
+    needs: changes
+    if: ${{ needs.changes.outputs.binarybuilder == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
         with:
-          version: '1.8'
+          version: '1.9'
           arch: x64
       - name: Cache artifacts
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         env:
           cache-name: cache-artifacts
         with:
@@ -39,3 +54,23 @@ jobs:
           git config --global user.email "github_action@example.test"
           julia --project=./binarybuilder -e "using Pkg; Pkg.instantiate()"
           julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=epolack/ABINIT_jll.jl
+
+  test_jll:
+    name: "Testing JLL"
+    needs: [buildjll]
+    if: always() && !cancelled() && !contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/epolack/HollvedRegistry.jl"))'
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Julia stable
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.9'
+          arch: x64
+
+      - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
