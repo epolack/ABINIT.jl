@@ -36,7 +36,7 @@ make install
 
 platforms = [
              Platform("x86_64", "linux"; libgfortran_version=v"4.0.0"),
-             Platform("x86_64", "linux"; gflibgfortran_version=v"5.0.0"),
+             Platform("x86_64", "linux"; libgfortran_version=v"5.0.0"),
             ]
 
 products = [
@@ -76,8 +76,5 @@ dependencies = [
                            uuid="656ef2d0-ae68-5445-9ca0-591084a874a2")),
 ]
 
-deployingargs = deepcopy(ARGS)
-push!(deployingargs, "--deploy=local")
-
-build_tarballs(deployingargs, name, version, sources, script, platforms, products,
-               dependencies; preferred_gcc_version=v"12")
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies;
+               preferred_gcc_version=v"12")

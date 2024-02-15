@@ -27,29 +27,15 @@ jobs:
             ${{ runner.os }}-jll-${{ env.cache-name }}-
             ${{ runner.os }}-jll-
             ${{ runner.os }}-
-      - uses: fusion-engineering/setup-git-credentials@v2
-        with:
-          credentials: https://cxxwrapdeploy:${{secrets.DEPLOY_KEY}}@github.com/
       - name: Build JLLs
         env:
+          # Needs old token because of check on its size.
           GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
           BINARYBUILDER_RUNNER: privileged
           BINARYBUILDER_USE_SQUASHFS: true
           BINARYBUILDER_AUTOMATIC_APPLE: true
         run: |
-          #git config --global user.name "al"
-          #git config --global user.email "al@example.test"
+          git config --global user.name "Github_Action"
+          git config --global user.email "github_action@example.test"
           julia --project=./binarybuilder -e "using Pkg; Pkg.instantiate()"
-          julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl
-      - name: Upload JLL artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ABINIT-binaries
-          path: ./products
-          retention-days: 1
-      - name: Upload JLL artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ABINIT_jll
-          path: ~/.julia/dev/ABINIT_jll
-          retention-days: 1
+          julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=epolack/ABINIT_jll.jl
