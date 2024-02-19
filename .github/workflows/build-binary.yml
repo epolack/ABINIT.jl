@@ -50,6 +50,8 @@ jobs:
           BINARYBUILDER_USE_SQUASHFS: true
           BINARYBUILDER_AUTOMATIC_APPLE: true
         run: |
+          # To let BinaryBuilder increase the patch number automatically.
+          julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/epolack/HollvedRegistry.jl"))'
           git config --global user.name "Github_Action"
           git config --global user.email "github_action@example.test"
           julia --project=./binarybuilder -e "using Pkg; Pkg.instantiate()"
