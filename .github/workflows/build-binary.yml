@@ -19,6 +19,7 @@ jobs:
           filters: |
             binarybuilder:
               - 'binarybuilder/**'
+              - '.github/workflows/binarry-builder.yaml'
 
   buildjll:
     name: Build JLL
@@ -28,6 +29,7 @@ jobs:
     steps:
       # To let BinaryBuilder increase the patch number automatically.
       - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/epolack/HollvedRegistry.jl"))'
+      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/JuliaRegistries/General"))'
 
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
