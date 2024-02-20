@@ -35,17 +35,7 @@ jobs:
         with:
           version: '1.9'
           arch: x64
-      - name: Cache artifacts
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-jll-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-jll-${{ env.cache-name }}-
-            ${{ runner.os }}-jll-
-            ${{ runner.os }}-
+
       - name: Build JLLs
         env:
           # Needs old token because of check on its size.
@@ -88,6 +78,17 @@ jobs:
           version: '1.9'
           arch: x64
 
-      - uses: julia-actions/cache@v1
+      - name: Cache artifacts
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-jll-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-jll-${{ env.cache-name }}-
+            ${{ runner.os }}-jll-
+            ${{ runner.os }}-
+
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
