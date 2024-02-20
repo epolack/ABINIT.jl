@@ -1,11 +1,4 @@
 using BinaryBuilder, Pkg
-# https://github.com/JuliaPackaging/BinaryBuilder.jl/pull/1315
-using GitHub
-
-github_token = get(ENV, "GITHUB_TOKEN", "")
-if length(github_token) > 0
-    BinaryBuilder.Wizard._github_auth[] = GitHub.authenticate(github_token)
-end
 
 name = "ABINIT"
 version = v"9.10.3"
