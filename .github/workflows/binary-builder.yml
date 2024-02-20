@@ -24,12 +24,11 @@ jobs:
   buildjll:
     name: Build JLL
     needs: changes
-    if: ${{ needs.changes.outputs.binarybuilder == 'true' }}
+    if: needs.changes.outputs.binarybuilder == 'true'
     runs-on: ubuntu-latest
     steps:
       # To let BinaryBuilder increase the patch number automatically.
-      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/epolack/HollvedRegistry.jl"))'
-      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/JuliaRegistries/General"))'
+      - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
 
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
@@ -58,7 +57,20 @@ jobs:
           git config --global user.name "Github_Action"
           git config --global user.email "github_action@example.test"
           julia --project=./binarybuilder -e "using Pkg; Pkg.instantiate()"
+
+      - name: Deploying locally
+        run: julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=local
+        if: ${{ github.ref != 'refs/heads/master' }}
+
+      - name: Deploying to registry
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
           julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=epolack/ABINIT_jll.jl
+          julia -e 'using LocalRegistry, ABINIT_jll; register(ABINIT_jll)'
+
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
+
 
   test_jll:
     name: "Testing JLL"
