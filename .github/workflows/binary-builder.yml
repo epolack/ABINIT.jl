@@ -19,7 +19,7 @@ jobs:
           filters: |
             binarybuilder:
               - 'binarybuilder/**'
-              - '.github/workflows/binarry-builder.yaml'
+              - '.github/workflows/binary-builder.yml'
 
   buildjll:
     name: Build JLL
@@ -37,26 +37,29 @@ jobs:
           arch: x64
 
       - name: Build JLLs
-        env:
-          # Needs old token because of check on its size.
-          GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
-          BINARYBUILDER_RUNNER: privileged
-          BINARYBUILDER_USE_SQUASHFS: true
-          BINARYBUILDER_AUTOMATIC_APPLE: true
         run: |
           git config --global user.name "Github_Action"
           git config --global user.email "github_action@example.test"
           julia --project=./binarybuilder -e "using Pkg; Pkg.instantiate()"
 
       - name: Deploying locally
+        env:
+          BINARYBUILDER_RUNNER: privileged
+          BINARYBUILDER_USE_SQUASHFS: true
+          BINARYBUILDER_AUTOMATIC_APPLE: true
         run: julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=local
-        if: ${{ github.ref != 'refs/heads/master' }}
+        if: github.ref != 'refs/heads/main'
 
       - name: Deploying to registry
-        if: ${{ github.ref == 'refs/heads/master' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
+          BINARYBUILDER_RUNNER: privileged
+          BINARYBUILDER_USE_SQUASHFS: true
+          BINARYBUILDER_AUTOMATIC_APPLE: true
+        if: github.ref == 'refs/heads/main'
         run: |
           julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=epolack/ABINIT_jll.jl
-          julia -e 'using LocalRegistry, ABINIT_jll; register(ABINIT_jll)'
+          julia -e 'import Pkg; Pkg.add("LocalRegistry"); Pkg.add("ABINIT_jll"); using LocalRegistry, ABINIT_jll; register(ABINIT_jll)'
 
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
