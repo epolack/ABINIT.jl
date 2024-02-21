@@ -31,8 +31,6 @@ jobs:
       # - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
       - uses: julia-actions/add-julia-registry@v1
         with:
-          # Does not allow PAT yet (https://github.com/julia-actions/add-julia-registry/issues/20)
-          key: ${{ secrets.SSH_KEY }}
           registry: epolack/HollvedRegistry.jl
 
 
