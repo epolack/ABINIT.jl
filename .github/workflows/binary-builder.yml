@@ -28,7 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # To let BinaryBuilder increase the patch number automatically.
-      - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
+      # - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
+      - uses: julia-actions/add-julia-registry@v1
+        with:
+          # Does not allow PAT yet (https://github.com/julia-actions/add-julia-registry/issues/20)
+          key: ${{ secrets.SSH_KEY }}
+          registry: epolack/HollvedRegistry.jl
+
 
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
@@ -50,7 +56,7 @@ jobs:
         run: julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=local
         if: github.ref != 'refs/heads/main'
 
-      - name: Deploying to registry
+      - name: Deploying
         env:
           GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
           BINARYBUILDER_RUNNER: privileged
@@ -59,10 +65,33 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           julia --project=./binarybuilder ./binarybuilder/build_tarballs.jl --deploy=epolack/ABINIT_jll.jl
-          julia -e 'import Pkg; Pkg.add("LocalRegistry"); Pkg.add("ABINIT_jll"); using LocalRegistry, ABINIT_jll; register(ABINIT_jll)'
 
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
+
+  update_registry:
+    name: "Updating local Registry"
+    needs: [buildjll]
+    if: always() && !cancelled() && contains(needs.*.result, 'success') && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master version of JLL
+        uses: actions/checkout@v4
+        with:
+          repository: epolack/ABINIT_jll.jl
+
+      - uses: julia-actions/add-julia-registry@v1
+        with:
+          # Does not allow PAT yet (https://github.com/julia-actions/add-julia-registry/issues/20)
+          key: ${{ secrets.SSH_KEY }}
+          registry: epolack/HollvedRegistry.jl
+
+      - name: Deploying to registry
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          rm -rf ~/.julia/registries/HollvedRegistry  # but why?
+          julia -e 'import Pkg; Pkg.add("LocalRegistry"); using LocalRegistry; Pkg.activate("."); Pkg.instantiate(); using ABINIT_jll; register(ABINIT_jll; gitconfig=Dict("user.name" => "Github Actions", "user.email" => "github_action@example.test"))'
 
 
   test_jll:
@@ -71,8 +100,6 @@ jobs:
     if: always() && !cancelled() && !contains(needs.*.result, 'failure')
     runs-on: ubuntu-latest
     steps:
-      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(; url="https://github.com/epolack/HollvedRegistry.jl"))'
-
       - uses: actions/checkout@v4
 
       - name: Setup Julia stable
@@ -94,4 +121,7 @@ jobs:
             ${{ runner.os }}-
 
       - uses: julia-actions/julia-buildpkg@v1
+        with:
+          localregistry: |
+            https://github.com/epolack/HollvedRegistry.jl
       - uses: julia-actions/julia-runtest@v1
