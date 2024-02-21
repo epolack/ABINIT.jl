@@ -28,11 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # To let BinaryBuilder increase the patch number automatically.
-      # - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
-      - uses: julia-actions/add-julia-registry@v1
-        with:
-          registry: epolack/HollvedRegistry.jl
-
+      - run: julia -e 'using Pkg; pkg"registry add General https://github.com/epolack/HollvedRegistry.jl"'
 
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
