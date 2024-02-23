@@ -1,5 +1,5 @@
 diff --git a/config/m4/auto-optim.m4 b/config/m4/auto-optim.m4
-index 3ac81eb..21a3be2 100644
+index 90d30ba..064cd5a 100644
 --- a/config/m4/auto-optim.m4
 +++ b/config/m4/auto-optim.m4
 @@ -41,11 +41,11 @@ AC_DEFUN([ABI_CC_OPTFLAGS],[
@@ -16,7 +16,7 @@ index 3ac81eb..21a3be2 100644
            ;;
        esac   # [case: abi_optim_flavor, indent: 2, item: True]
        ;;
-@@ -193,11 +193,11 @@ AC_DEFUN([ABI_CXX_OPTFLAGS],[
+@@ -212,11 +212,11 @@ AC_DEFUN([ABI_CXX_OPTFLAGS],[
            ;;
          standard)
            abi_optim_flavor_opt="standard"
@@ -30,7 +30,7 @@ index 3ac81eb..21a3be2 100644
            ;;
        esac   # [case: abi_optim_flavor, indent: 2, item: True]
        ;;
-@@ -345,11 +345,11 @@ AC_DEFUN([ABI_FC_OPTFLAGS],[
+@@ -383,11 +383,11 @@ AC_DEFUN([ABI_FC_OPTFLAGS],[
            ;;
          standard)
            abi_optim_flavor_opt="standard"
@@ -82,10 +82,10 @@ index 31dd76e..3c5f355 100644
 +standard_comp = -O2 
 +aggressive_comp = -O3 -funroll-loops -faggressive-function-elimination
 diff --git a/configure b/configure
-index 96ece5d..c76ec14 100755
+index 0d32fe0..d0d3eec 100755
 --- a/configure
 +++ b/configure
-@@ -17435,11 +17435,11 @@ $as_echo_n "checking which cc optimizations to apply... " >&6; }
+@@ -19125,11 +19125,11 @@ printf %s "checking which cc optimizations to apply... " >&6; }
            ;;
          standard)
            abi_optim_flavor_opt="standard"
@@ -99,7 +99,7 @@ index 96ece5d..c76ec14 100755
            ;;
        esac   # [case: abi_optim_flavor, indent: 2, item: True]
        ;;
-@@ -17588,11 +17588,11 @@ $as_echo_n "checking which cxx optimizations to apply... " >&6; }
+@@ -19297,11 +19297,11 @@ printf %s "checking which cxx optimizations to apply... " >&6; }
            ;;
          standard)
            abi_optim_flavor_opt="standard"
@@ -113,7 +113,7 @@ index 96ece5d..c76ec14 100755
            ;;
        esac   # [case: abi_optim_flavor, indent: 2, item: True]
        ;;
-@@ -17741,11 +17741,11 @@ $as_echo_n "checking which fc optimizations to apply... " >&6; }
+@@ -19469,11 +19469,11 @@ printf %s "checking which fc optimizations to apply... " >&6; }
            ;;
          standard)
            abi_optim_flavor_opt="standard"

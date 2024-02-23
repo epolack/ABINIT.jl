@@ -1,11 +1,11 @@
 using BinaryBuilder, Pkg
 
 name = "ABINIT"
-version = v"9.10.3"
+version = v"9.10.5"
 
 sources = [
     ArchiveSource("https://www.abinit.org/sites/default/files/packages/abinit-$(version).tar.gz",
-                  "3f2a9aebbf1fee9855a09dd687f88d2317b8b8e04f97b2628ab96fb898dce49b"),
+                  "a9e0f0e058baa6088ea93d26ada369ccf0fe52dc9d4a865b1c38c20620148cd5"),
     DirectorySource(joinpath(@__DIR__, "patches")),
 ]
 
